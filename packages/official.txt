@@ -1,0 +1,3 @@
+# Extra official packages to install on a new machine.
+# Add one package per line. stow is required by install.sh.
+stow
