@@ -1,0 +1,101 @@
+# Global mise config -> ~/.config/mise/mise.toml
+#
+# This is the ONLY mise config in this repo. Do not add a project-local
+# mise.toml at the repo root: tools declared there resolve only while the cwd
+# is inside ~/dotfiles, which silently breaks every bash script and
+# non-repo shell (SI-118).
+#
+# Omarchy already writes ~/.config/mise/config.toml via `mise use -g` (the
+# ~/.local/bin wrappers for gh, grok, claude, …). mise loads that file, then
+# this one, so the pins here win. Leave config.toml alone — editing it fights
+# those wrappers and would dirty this symlink.
+#
+# /etc/mise/conf.d/omarchy.toml only aliases cursor-agent. [tool_alias] merges
+# by key, so cship below does not replace that alias.
+#
+# CLI tools are pinned to exact versions. Language runtimes and a few
+# self-updating helpers stay on "latest".
+#
+# Ported from kogakure/dotfiles config/mise/mise.toml. macOS-only entries
+# (the Intel cargo:/npm: fallbacks) are dropped; this repo is Linux-only, so
+# the linux os = […] guards are unnecessary too.
+#
+# Deliberately NOT owned by mise:
+#   tmux            - Omarchy pacman. Long-running server and parent of every
+#                     shell; a shim that vanishes on a config-resolution change
+#                     is a far worse failure mode than a slightly stale binary.
+#   postgres        - not used on this host.
+#   youtube-dl      - Omarchy ships yt-dlp.
+#   claude-code     - duplicate of `claude`.
+#   rust            - rustup. mise's rust backend only drives rustup anyway
+#                     (SI-123). One owner: rustup default stable.
+#   hunkdiff        - same aqua:modem-dev/hunk package as hunk; the tarball
+#                     only ships a `hunk` binary, so a second pin cannot exec.
+
+# cship is a GitHub release with no registry entry, so the alias gives it a
+# short name (SI-86). github: rather than the deprecated ubi: backend.
+[tool_alias]
+cship = "github:stephenleo/cship"
+
+[tools]
+atuin = "18.21.0"
+bat = "0.26.1"
+bat-extras = "2024.08.24"
+bun = "latest"
+claude = "2.1.263"
+codex = "0.153.4"
+cship = "1.8.3"
+delta = "0.19.2"
+deno = "latest"
+direnv = "latest"
+docker-cli = "29.8.0"
+eza = "0.23.5"
+fd = "10.5.0"
+fzf = "0.74.3"
+gh = "2.100.0"
+git-lfs = "3.8.0"
+gitleaks = "8.30.1"
+go = "latest"
+grok = { version = "1.0.24", bin = "grok", platforms = { windows-arm64 = { bin = "grok.exe", url = "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-{{ version }}-windows-aarch64.exe" }, windows-x64 = { bin = "grok.exe", url = "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-{{ version }}-windows-x86_64.exe" } }, url = 'https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-{{ version }}-{{ os() }}-{{ arch(x64="x86_64", arm64="aarch64") }}', version_list_url = "https://x.ai/cli/stable" }
+herdr = "0.9.0"
+hunk = "0.21.1"
+jj = "0.45.1"
+jq = "1.8.2"
+lazydocker = "0.25.2"
+lazygit = "0.65.0"
+lazyssh = "0.3.0"
+lua = "latest"
+neovim = "0.12.5"
+node = "26.8.1"
+"npm:playwright-cli" = "latest"
+opencode = "1.18.29"
+oxlint = "1.82.0"
+pandoc = "3.11"
+pi = "0.85.1"
+pnpm = "12.3.4"
+prettier = "3.9.6"
+python = "latest"
+ripgrep = "15.2.0"
+ruby = "4.0.6"
+shellcheck = "0.11.0"
+shfmt = "3.14.1"
+sqlite = "3.53.4"
+starship = "1.26.0"
+superfile = "1.6.0"
+typst = "0.15.1"
+usage = "latest"
+uv = "0.12.10"
+worktrunk = "0.76.0"
+yazi = "26.9.1"
+yq = "4.53.6"
+zoxide = "0.10.0"
+
+[settings]
+idiomatic_version_file_enable_tools = ["ruby", "node"]
+not_found_auto_install = true
+
+# Omarchy sets this in config.toml so `mise up` cannot delete a version a
+# live process is executing from. Repeat it here so it survives if that file
+# is reset.
+[settings.upgrade]
+auto_prune = false

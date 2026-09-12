@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOST="${DOTFILES_HOST:-$(hostname -s)}"
 TARGET="${HOME}"
-PACKAGES=(hypr git bash env omarchy)
+PACKAGES=(hypr git bash env omarchy mise)
 
 need_cmd() {
   command -v "$1" >/dev/null || {

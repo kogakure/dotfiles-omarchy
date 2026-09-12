@@ -18,6 +18,13 @@ cd ~/dotfiles
 
 `install.sh` backs up any conflicting regular files, then restows. Rerun it after `omarchy refresh` if a symlink was replaced with a real file.
 
+Then install the pinned CLI tools (Omarchy already put mise on `PATH`):
+
+```bash
+mise trust ~/.config/mise/mise.toml
+mise install
+```
+
 Host overlay is selected by hostname (`omarchy` on this laptop). Override with `DOTFILES_HOST=omarchy ./install.sh`.
 
 ## Layout
@@ -30,10 +37,11 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `bash` | `~/.bashrc` | Keep sourcing Omarchy's rc; add aliases below the comment. |
 | `env` | `~/.config/environment.d/ssh-agent.conf` | User ssh-agent socket. |
 | `omarchy` | `~/.config/omarchy/hooks/post-update.d/` | After `omarchy update`, print git drift if any. |
+| `mise` | `~/.config/mise/mise.toml` | Pinned CLI tools. Loads after Omarchy's `config.toml`, so pins win. |
 
 ## Extra packages
 
-`packages/official.txt` and `packages/aur.txt` list explicitly installed packages that are **not** Omarchy defaults (ISO lists, `core`, distro meta-packages, CPU microcode). They are not applied automatically.
+CLI tools are pinned in `mise/.config/mise/mise.toml`. `packages/official.txt` and `packages/aur.txt` are only for extras **mise cannot supply**, plus explicitly installed packages that are **not** Omarchy defaults (ISO lists, `core`, distro meta-packages, CPU microcode). They are not applied automatically.
 
 Refresh the lists from this machine, then commit if the diff looks right:
 
@@ -63,5 +71,6 @@ Edit the live files (`Super + Space` → Setup, or `$EDITOR ~/.config/hypr/...`)
 - SSH private keys, `~/.config/gh/hosts.yml`
 - Browser profiles
 - Hook `*.sample` files Omarchy ships
+- `~/.config/mise/config.toml` (Omarchy writes this via `mise use -g`)
 
 Grow this tree when a setting actually diverges. Do not snapshot all of `~/.config`.
