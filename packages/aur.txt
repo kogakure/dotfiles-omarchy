@@ -1,2 +1,3 @@
 # Extra AUR packages to install on a new machine.
 # Add one package per line.
+proton-pass-bin
