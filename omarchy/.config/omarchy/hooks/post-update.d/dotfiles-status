@@ -7,6 +7,13 @@ if [[ ! -d "$repo/.git" ]]; then
   exit 0
 fi
 
+if [[ -x "$repo/packages/snapshot" ]]; then
+  if ! "$repo/packages/snapshot" --check >/dev/null 2>&1; then
+    echo "Installed extras differ from $repo/packages/*.txt"
+    echo "Refresh with: $repo/packages/snapshot"
+  fi
+fi
+
 status="$(git -C "$repo" status --short)"
 if [[ -z "$status" ]]; then
   exit 0

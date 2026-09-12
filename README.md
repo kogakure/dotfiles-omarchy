@@ -31,7 +31,24 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `env` | `~/.config/environment.d/ssh-agent.conf` | User ssh-agent socket. |
 | `omarchy` | `~/.config/omarchy/hooks/post-update.d/` | After `omarchy update`, print git drift if any. |
 
-Package lists in `packages/` are for extras you add later (`omarchy pkg add`, AUR). They are not applied automatically.
+## Extra packages
+
+`packages/official.txt` and `packages/aur.txt` list explicitly installed packages that are **not** Omarchy defaults (ISO lists, `core`, distro meta-packages, CPU microcode). They are not applied automatically.
+
+Refresh the lists from this machine, then commit if the diff looks right:
+
+```bash
+~/dotfiles/packages/snapshot
+```
+
+On a new machine, after `./install.sh`:
+
+```bash
+grep -vE '^#|^$' packages/official.txt | xargs -r omarchy pkg add
+grep -vE '^#|^$' packages/aur.txt | xargs -r omarchy pkg aur add
+```
+
+The post-update hook reminds you when the lists have drifted. It does not rewrite them.
 
 ## Daily use
 

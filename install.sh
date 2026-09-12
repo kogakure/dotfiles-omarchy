@@ -67,5 +67,6 @@ else
 fi
 
 chmod +x "$ROOT/omarchy/.config/omarchy/hooks/post-update.d/dotfiles-status" 2>/dev/null || true
+chmod +x "$ROOT/packages/snapshot" 2>/dev/null || true
 
 echo "Stowed packages into $TARGET"
