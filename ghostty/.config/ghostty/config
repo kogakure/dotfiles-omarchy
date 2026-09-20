@@ -1,0 +1,69 @@
+# Personal Ghostty overlay. Omarchy regenerates colours into
+# ~/.local/state/omarchy/current/theme/ghostty.conf on every theme change;
+# this file includes that and otherwise owns ~/.config/ghostty/config.
+#
+# Ghostty processes `config-file` at the end of the current file, so we cannot
+# include /usr/share/omarchy/config/ghostty/config and then override keys here
+# (the packaged file would win). Linux/GTK/Hyprland keys below are copied from
+# that packaged file instead of included.
+#
+# Dropped from kogakure/dotfiles config/ghostty/config:
+# - theme = tokyonight (Omarchy owns the colour block)
+# - macos-* keys
+# - Monaspace families / font-feature / adjust-cell-height (font not installed;
+#   keep JetBrains so `omarchy font set` can sed font-family)
+# - window-height / window-width (tiling WM)
+# - cmd+enter fullscreen (ctrl+enter is Ghostty's default; Super is Hyprland)
+# - tmux prefix keybinds (SI-139; they target the macOS tmux map, not Omarchy's)
+# - shift+enter=text:\x1b\r (Omarchy migration sends CSI-u for Codex/TUIs)
+
+# Dynamic theme colors
+config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
+
+# Font
+font-family = "JetBrainsMono Nerd Font"
+font-style = Regular
+font-size = 11
+
+# Window
+window-theme = ghostty
+window-padding-x = 30
+window-padding-y = 30
+window-colorspace = display-p3
+background-opacity = 0.85
+background-opacity-cells = true
+background-blur = 25
+confirm-close-surface=false
+resize-overlay = never
+gtk-toolbar-style = flat
+
+# Clipboard / pointer
+clipboard-read = allow
+clipboard-write = allow
+mouse-hide-while-typing = true
+
+# Cursor styling
+cursor-style = "block"
+cursor-style-blink = false
+
+# Cursor styling + SSH session terminfo
+# (all shell integration options must be passed together)
+shell-integration-features = no-cursor,ssh-env
+
+# Keyboard bindings
+keybind = shift+insert=paste_from_clipboard
+keybind = control+insert=copy_to_clipboard
+# Send Shift+Enter as CSI-u so TUIs can distinguish it from Enter.
+keybind = shift+enter=csi:13;2u
+# Legacy encoding sends Alt+Shift+Enter the same as Alt+Enter; send CSI-u so tmux can match M-S-Enter.
+keybind = alt+shift+enter=csi:13;4u
+keybind = super+control+shift+alt+arrow_down=resize_split:down,100
+keybind = super+control+shift+alt+arrow_up=resize_split:up,100
+keybind = super+control+shift+alt+arrow_left=resize_split:left,100
+keybind = super+control+shift+alt+arrow_right=resize_split:right,100
+
+# Slowdown mouse scrolling
+mouse-scroll-multiplier = 0.95
+
+# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
+async-backend = epoll
