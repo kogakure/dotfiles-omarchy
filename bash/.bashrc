@@ -96,3 +96,12 @@ alias ars='atuin run script'
 alias cc='claude --dangerously-skip-permissions'
 alias cy='codex --dangerously-bypass-approvals-and-sandbox'
 alias youtube-dl='yt-dlp'
+
+# User functions (SI-135). Same idea as Omarchy's default/bash/fns: one file
+# per function, sourced from a directory rather than inlined here.
+# An unmatched glob expands to itself, so skip if ~/.functions is empty.
+for file in ~/.functions/*.sh; do
+  [ -e "$file" ] || continue
+  # shellcheck disable=SC1090
+  source "$file"
+done
