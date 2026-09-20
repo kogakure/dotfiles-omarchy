@@ -1,37 +1,104 @@
-# See https://git-scm.com/docs/git-config
+# Personal git overlay. Omarchy ships ~/.config/git/config from
+# /usr/share/omarchy/config/git/config; this stow file replaces that copy, so
+# include the packaged defaults instead of duplicating them (aliases, pull.rebase,
+# rerere, histogram diffs, …). Only identity, credentials, and the macOS deltas
+# worth keeping live here.
+#
+# Dropped from kogakure/dotfiles config/git/config: Kaleidoscope, core.editor=code,
+# web.browser=open, pager.diff=diffnav (not installed), includeIf personal/work
+# (no config-personal; SI-134), patience diffs and branch.sort=-authordate
+# (Omarchy already sets histogram / -committerdate), push.default=upstream
+# (new branches created from origin/master would push to master).
 
-[alias]
-	co = checkout
-	br = branch
-	ci = commit
-	st = status
-[init]
-	defaultBranch = master
-[pull]
-	rebase = true 			 # Rebase (instead of merge) on pull
-[push]
-	autoSetupRemote = true   # Automatically set upstream branch on push
-[diff]
-	algorithm = histogram    # Clearer diffs on moved/edited lines
-	colorMoved = plain       # Highlight moved blocks in diffs
-	mnemonicPrefix = true    # More intuitive refs in diff output
-[commit]
-	verbose = true           # Include diff comment in commit message template
-[column]
-	ui = auto 			     # Output in columns when possible
-[branch]
-	sort = -committerdate    # Sort branches by most recent commit first
-[tag]
-	sort = -version:refname  # Sort version numbers as you would expect
-[rerere]
-	enabled = true           # Record and reuse conflict resolutions
-	autoupdate = true        # Apply stored conflict resolutions automatically
+[include]
+	path = /usr/share/omarchy/config/git/config
+
 [user]
 	name = Stefan Imhoff
 	email = stefan@imhoff.name
+	useConfigOnly = true
+
+# Resolved through PATH, not by absolute path. `gh auth setup-git` writes a
+# machine path that goes stale the moment gh is a mise tool (SI-118).
 [credential "https://github.com"]
 	helper =
 	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
 	helper =
 	helper = !gh auth git-credential
+
+[core]
+	pager = hunk pager
+	whitespace = trailing-space,space-before-tab
+
+[delta]
+	light = false
+	line-numbers = true
+	navigate = true
+	side-by-side = true
+	syntax-theme = Dracula
+
+[interactive]
+	diffFilter = delta --color-only
+
+# Extra aliases beyond Omarchy's co / br / ci / st.
+[alias]
+	branches = for-each-ref --sort=-committerdate --format="%(color:blue)%(authordate:relative)%09%(color:red)%(authorname)%09%(color:white)%(color:bold)%(refname:short)" refs/remotes
+	cp = cherry-pick
+	hist = log --color --graph --decorate --abbrev-commit --date=short --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(blue)[%an]%Creset' --abbrev-commit --
+	hub = !gh repo view --web
+	ignored = ls-files --others --directory
+	local-branches = "!git branch -vv | cut -c 3- | awk '$3 !~/\\[/ { print $1 }'"
+	ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+	mainbranch = "!git remote show origin | sed -n '/HEAD branch/s/.*: //p'"
+	merged = branch --merged
+	prune = fetch --prune
+	pub = publish
+	publish = push origin HEAD --force-with-lease
+	rb = rebase
+	squash = "!git rebase -v -i $(git mainbranch)"
+	stash-all = stash push --include-untracked
+	stats = shortlog -sn --all --no-merges
+	synced = "!git pull origin $(git mainbranch) --rebase"
+	today = log --since=00:00:00 --all --no-merges --oneline
+	undo = reset --soft HEAD^
+	unmerged = branch --no-merge
+	unstage = reset HEAD --
+	update = "!git pull origin $(git rev-parse --abbrev-ref HEAD) --rebase"
+
+[apply]
+	whitespace = fix
+
+[fetch]
+	prune = true
+	recurseSubmodules = true
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	process = git-lfs filter-process
+	required = true
+	smudge = git-lfs smudge -- %f
+
+[help]
+	autocorrect = 1
+
+[merge]
+	conflictstyle = diff3
+
+[pull]
+	ff = only
+
+[push]
+	followTags = true
+
+[rebase]
+	autosquash = true
+
+[status]
+	showUntrackedFiles = all
+
+[submodule]
+	recurse = true
+
+[transfer]
+	fsckObjects = true

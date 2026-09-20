@@ -1,0 +1,15 @@
+*.lnk
+*.pyc
+*.pyo
+*.session
+*.sw[nop]
+.BridgeSort
+.DS_Store
+._*
+.agignore
+.bundle/
+m~
+tags
+.tool-versions
+
+**/.claude/settings.local.json
