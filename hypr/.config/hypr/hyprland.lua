@@ -63,3 +63,6 @@ end
 hl.on("monitor.removed", function()
   hl.timer(reclaim_orphaned_workspaces, { timeout = 250, type = "oneshot" })
 end)
+
+-- Load settings written by OmaSettings (omasettings:managed).
+require("hypr.omasettings")
