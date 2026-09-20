@@ -33,7 +33,7 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 |---|---|---|
 | `hypr` | `~/.config/hypr/*.lua` | Shared Hyprland overrides. `hyprland.lua` reclaims workspaces when a display unplugs. |
 | `hosts/omarchy` | `~/.config/hypr/monitors.lua` | This machine: laptop + Studio Display. |
-| `git` | `~/.config/git/config` | Identity and aliases. Credential helper is `gh`, not a machine path. |
+| `git` | `~/.config/git/config`, `ignore` | Identity, `gh` credentials, hunk/delta, extra aliases. Includes Omarchy's shipped git config so distro defaults are not copied. Global gitignore. |
 | `bash` | `~/.bashrc`, `~/.functions/*.sh` | Keep sourcing Omarchy's rc; PATH, env and aliases in bashrc. Functions in a sourced directory (Omarchy's `fns` pattern). |
 | `env` | `~/.config/environment.d/ssh-agent.conf` | User ssh-agent socket. |
 | `omarchy` | `~/.config/omarchy/hooks/post-update.d/` | After `omarchy update`, print git drift if any. |
