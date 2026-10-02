@@ -15,6 +15,19 @@ need_cmd() {
 }
 
 need_cmd stow
+need_cmd git
+
+# Identity lives in the vault submodule, not in this public tree (SI-137).
+# Nested submodules inside private/ (agent skills, Claude plugins) stay
+# uninitialised; the tickets that use them can init those later.
+init_private() {
+  if [[ ! -e "$ROOT/.git" || ! -f "$ROOT/.gitmodules" ]]; then
+    echo "Not a full checkout; skipping private submodule" >&2
+    return 0
+  fi
+
+  git -C "$ROOT" submodule update --init -- private
+}
 
 backup_if_conflict() {
   local dest="$1"
@@ -56,9 +69,23 @@ stow_package() {
   stow -v -d "$dir" -t "$TARGET" -R "$pkg"
 }
 
+init_private
+
 for pkg in "${PACKAGES[@]}"; do
   stow_package "$ROOT" "$pkg"
 done
+
+# This checkout lives outside the includeIf directories, so without a local
+# include, commits here have no identity. Signing stays off until SI-152:
+# config-personal turns it on, and a local value beats the global override.
+# No symlink into ~/.config/git: stow treats a link that points back into
+# this repo as one of its own and folds the directory on the next restow.
+if [[ -e "$ROOT/.git" && -f "$ROOT/private/git/config-personal" ]]; then
+  # Quoted on purpose: git expands ~ in include.path. Leave it for git.
+  # shellcheck disable=SC2088
+  git -C "$ROOT" config --local include.path '~/dotfiles/private/git/config-personal'
+  git -C "$ROOT" config --local commit.gpgsign false
+fi
 
 if [[ -d "$ROOT/hosts/$HOST" ]]; then
   stow_package "$ROOT/hosts" "$HOST"

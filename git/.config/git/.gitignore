@@ -1,0 +1,3 @@
+# Identity files belong in private/git/. If one is copied into this
+# directory, do not commit it.
+config-*
