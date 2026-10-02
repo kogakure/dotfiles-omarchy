@@ -39,6 +39,7 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `omarchy` | `~/.config/omarchy/hooks/post-update.d/` | After `omarchy update`, print git drift if any. |
 | `mise` | `~/.config/mise/mise.toml` | Pinned CLI tools. Loads after Omarchy's `config.toml`, so pins win. |
 | `ghostty` | `~/.config/ghostty/config` | Personal deltas; Omarchy still owns the colour block via the generated theme include. |
+| `atuin` | `~/.config/atuin/config.toml` | History search settings from the Macs. The binary is the mise pin. `atuin login` is interactive; the encryption key stays in Proton Pass. |
 
 ## Extra packages
 

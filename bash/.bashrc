@@ -105,3 +105,11 @@ for file in ~/.functions/*.sh; do
   # shellcheck disable=SC1090
   source "$file"
 done
+
+# Atuin (SI-142). Last on purpose: Omarchy's rc has already installed the
+# starship prompt and fzf's Ctrl-R. atuin's bundled bash-preexec has to wrap
+# that prompt, and its bindings have to replace fzf's history widget.
+# Same line as shell/hooks.spec on the Macs.
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init bash)"
+fi
