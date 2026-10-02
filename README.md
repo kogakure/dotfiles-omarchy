@@ -95,5 +95,6 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - Browser profiles
 - Hook `*.sample` files Omarchy ships
 - `~/.config/mise/config.toml` (Omarchy writes this via `mise use -g`)
+- `~/.config/starship.toml` (SI-141). Keep Omarchy's. Colours are ANSI `cyan`, so they follow the theme palette. The Mac prompt is not ported.
 
 Grow this tree when a setting actually diverges. Do not snapshot all of `~/.config`.
