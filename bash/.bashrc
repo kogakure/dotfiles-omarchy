@@ -69,8 +69,7 @@ source "$OMARCHY_PATH/default/bash/rc"
 #   ls   Omarchy wins (eza -lh --icons=auto). Port ll for a git long listing.
 #   lt   Omarchy wins (eza --tree --level=2).
 #   t    Omarchy wins (tmux attach || new -s Work). Port ta as attach-only.
-# Dropped: @darwin (icloud, dropbox, ia), emacs/e (not installed),
-# glu (no config-personal; identity is in git/config).
+# Dropped: @darwin (icloud, dropbox, ia), emacs/e (not installed).
 
 if GPG_TTY="$(tty)" && [ "$GPG_TTY" != "not a tty" ]; then
   export GPG_TTY
@@ -84,6 +83,13 @@ alias cd..='cd ..'
 alias mkdir='mkdir -p'
 alias ll='eza -lh --git --group-directories-first --icons=auto'
 alias dotfiles='cd $HOME/dotfiles'
+
+# git local user. Points this repo at private/git/config-personal.
+# Repos under ~/Code/personal and ~/Code/work already include that file.
+# The private file also sets commit.gpgsign; signing stays off globally
+# until the key is imported (SI-152). A repo you glu will try to sign.
+# Quoted so git stores the tilde and expands it itself.
+alias glu='git config --local include.path '\''~/dotfiles/private/git/config-personal'\'''
 
 alias lg='lazygit'
 alias v='vim'

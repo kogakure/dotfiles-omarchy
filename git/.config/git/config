@@ -1,22 +1,36 @@
 # Personal git overlay. Omarchy ships ~/.config/git/config from
 # /usr/share/omarchy/config/git/config; this stow file replaces that copy, so
 # include the packaged defaults instead of duplicating them (aliases, pull.rebase,
-# rerere, histogram diffs, …). Only identity, credentials, and the macOS deltas
-# worth keeping live here.
+# rerere, histogram diffs, …). Credentials and the macOS deltas worth keeping
+# live here. Identity does not: name, email and signingkey are in the private
+# submodule (SI-137).
 #
 # Dropped from kogakure/dotfiles config/git/config: Kaleidoscope, core.editor=code,
-# web.browser=open, pager.diff=diffnav (not installed), includeIf personal/work
-# (no config-personal; SI-134), patience diffs and branch.sort=-authordate
-# (Omarchy already sets histogram / -committerdate), push.default=upstream
-# (new branches created from origin/master would push to master).
+# web.browser=open, pager.diff=diffnav (not installed), patience diffs and
+# branch.sort=-authordate (Omarchy already sets histogram / -committerdate),
+# push.default=upstream (new branches created from origin/master would push
+# to master).
 
 [include]
 	path = /usr/share/omarchy/config/git/config
 
+# Point straight at the submodule. A symlink in ~/.config/git that points
+# back into ~/dotfiles is adopted by stow on the next restow. A missing file
+# is ignored, and useConfigOnly then refuses to invent an identity.
 [user]
-	name = Stefan Imhoff
-	email = stefan@imhoff.name
 	useConfigOnly = true
+
+[includeIf "gitdir:~/Code/personal/"]
+	path = ~/dotfiles/private/git/config-personal
+
+[includeIf "gitdir:~/Code/work/"]
+	path = ~/dotfiles/private/git/config-work
+
+# config-personal sets commit.gpgsign. This machine has no secret key yet
+# (SI-152). A later value wins over the included one, so commits stay
+# unsigned. Remove this block once the key is imported.
+[commit]
+	gpgsign = false
 
 # Resolved through PATH, not by absolute path. `gh auth setup-git` writes a
 # machine path that goes stale the moment gh is a mise tool (SI-118).
