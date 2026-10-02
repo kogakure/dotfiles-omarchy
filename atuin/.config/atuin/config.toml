@@ -1,0 +1,13 @@
+# Ported from kogakure/dotfiles config/atuin/config.toml (SI-142).
+# That file is the upstream template with two settings uncommented. Atuin
+# 18.21 writes a longer template on first run; everything else stays default.
+# The history database, encryption key and session live in
+# ~/.local/share/atuin and are not tracked.
+
+# Enter edits the selected command instead of running it. Tab does the same.
+# New installs default this to true; the Macs keep the old behaviour.
+enter_accept = false
+
+# Sync v2, same as the Macs. Required to read their history.
+[sync]
+records = true
