@@ -5,6 +5,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOST="${DOTFILES_HOST:-$(hostname -s)}"
 TARGET="${HOME}"
+# nvim is stowed separately, and only after omarchy-nvim-setup has seeded
+# ~/.config/nvim. Creating that directory first would make setup skip the seed.
 PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr)
 
 need_cmd() {
@@ -79,6 +81,16 @@ init_private
 for pkg in "${PACKAGES[@]}"; do
   stow_package "$ROOT" "$pkg"
 done
+
+# theme.lua is not in this package. It stays the relative symlink that
+# omarchy-nvim-setup writes into the current theme. plugins/ already exists
+# on a seeded config, so stow links our files beside it instead of replacing
+# the directory. omarchy-nvim-refresh recopies the seed; rerun this script.
+if [[ ! -f "$TARGET/.config/nvim/init.lua" ]]; then
+  echo "omarchy-nvim is not set up; skipped the nvim overlay. Run omarchy-nvim-setup, then ./install.sh again." >&2
+else
+  stow_package "$ROOT" nvim
+fi
 
 install_herdr_plugins() {
   local list="$ROOT/packages/herdr-plugins"
