@@ -1,0 +1,7 @@
+# Deltas from lazygit 0.65. Omarchy ships an empty config.
+# overrideGpg: a gpg-agent handles passphrases, so lazygit does not suspend.
+# The delta theme matches git's delta.syntax-theme.
+git:
+  overrideGpg: true
+  diffRenderers:
+    - command: delta --dark --paging=never syntax-theme=Dracula
