@@ -1,0 +1,11 @@
+# herdr plugins installed by ./install.sh. One owner/repo per line, as
+# `herdr plugin install` takes it. `#` comments and blank lines are ignored.
+#
+# The installed ids are cloudmanic.herdr-plus and tdi.worktree-setup, which
+# is where the config under ~/.config/herdr/plugins/config/ lives.
+#
+# Not listed: ogulcancelik/herdr-browser (official.browser). Upstream removed
+# its manifest, and the Mac config's prefix+y binding for it is not ported.
+
+cloudmanic/herdr-plus
+tdi/herdr-worktree-setup

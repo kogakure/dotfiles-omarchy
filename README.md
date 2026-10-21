@@ -41,6 +41,7 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `mise` | `~/.config/mise/mise.toml` | Pinned CLI tools. Loads after Omarchy's `config.toml`, so pins win. |
 | `ghostty` | `~/.config/ghostty/config` | Personal deltas; Omarchy still owns the colour block via the generated theme include. |
 | `atuin` | `~/.config/atuin/config.toml` | History search settings from the Macs. The binary is the mise pin. `atuin login` is interactive; the encryption key stays in Proton Pass. |
+| `herdr` | `~/.config/herdr/config.toml` and `plugins/config/` | Omarchy keymap (prefix `Ctrl+Space`). Adds herdr-plus projects and quick actions, plus the worktree hook. `bin/node-install` is not stowed; the hook calls `~/dotfiles/bin/node-install`. |
 
 ## Extra packages
 
@@ -96,5 +97,6 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - Hook `*.sample` files Omarchy ships
 - `~/.config/mise/config.toml` (Omarchy writes this via `mise use -g`)
 - `~/.config/starship.toml` (SI-141). Keep Omarchy's. Colours are ANSI `cyan`, so they follow the theme palette. The Mac prompt is not ported.
+- Herdr plugin checkouts under `~/.config/herdr/plugins/github/` (SI-140). `./install.sh` installs the two repos in `packages/herdr-plugins`. The Mac prefix (`Ctrl+B`), Homebrew pane commands, and `official.browser` are not ported.
 
 Grow this tree when a setting actually diverges. Do not snapshot all of `~/.config`.

@@ -1,0 +1,6 @@
+# {{.WorkDir}} is the directory herdr-plus was launched from.
+
+name = "Reveal Working Dir"
+description = "Open the launch directory in the file manager"
+type = "command"
+command = "xdg-open {{.WorkDir}}"
