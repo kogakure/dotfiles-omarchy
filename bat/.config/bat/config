@@ -1,0 +1,11 @@
+# Theme stays ansi so it follows the terminal palette, same as Omarchy's
+# BAT_THEME. The Mac catppuccin-mocha line is not ported. Bat already ships
+# the Catppuccin themes; the four tmTheme files are not copied.
+--italic-text=always
+--map-syntax=".*ignore:Git Ignore"
+--map-syntax=".gitconfig.local:Git Config"
+--map-syntax="flake.lock:JSON"
+--pager="less -FR"
+--style="numbers,changes,header,grid"
+--theme=ansi
+--wrap=never

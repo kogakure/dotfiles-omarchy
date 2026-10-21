@@ -44,6 +44,8 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `herdr` | `~/.config/herdr/config.toml` and `plugins/config/` | Omarchy keymap (prefix `Ctrl+Space`). Adds herdr-plus projects and quick actions, plus the worktree hook. `bin/node-install` is not stowed; the hook calls `~/dotfiles/bin/node-install`. |
 | `nvim` | `~/.config/nvim/lua/…`, `dictionary/`, `spell/`, `thesaurus/` | Layered on omarchy-nvim, including the personal word lists. `./install.sh` skips this until `omarchy-nvim-setup` has seeded `~/.config/nvim`. `omarchy-nvim-refresh` recopies that seed; rerun `./install.sh`. `zg` writes through the spellfile symlink into this repo. |
 | `harper` | `~/.config/harper-ls/dictionary.txt` | Harper's user dictionary (`dictionary.txt` under `$XDG_CONFIG_HOME/harper-ls`). One personal word. Harper itself is not installed here yet. |
+| `bat` | `~/.config/bat/config` | Style, pager, wrap, and syntax maps from the Mac. Theme is `ansi`, not Catppuccin. |
+| `ripgrep` | `~/.config/ripgrep/ripgreprc` | Personal types and `--smart-case`. `RIPGREP_CONFIG_PATH` is set in `~/.bashrc`. |
 
 ## Extra packages
 
@@ -101,5 +103,6 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - `~/.config/starship.toml` (SI-141). Keep Omarchy's. Colours are ANSI `cyan`, so they follow the theme palette. The Mac prompt is not ported.
 - Herdr plugin checkouts under `~/.config/herdr/plugins/github/` (SI-140). `./install.sh` installs the two repos in `packages/herdr-plugins`. The Mac prefix (`Ctrl+B`), Homebrew pane commands, and `official.browser` are not ported.
 - The rest of `~/.config/nvim` (SI-143). omarchy-nvim owns the seed, `lazyvim.json`, and `lua/plugins/theme.lua` (a relative symlink to the current theme's `neovim.lua`). Do not replace that tree. Not ported: colorschemes, the telescope pile, snacks explorer, mini-animate, smear-cursor, iA Writer, smart-splits, and the disabled highlight-undo plugin.
+- Bat's Catppuccin themes (SI-145). Omarchy sets `BAT_THEME=ansi`, and bat 0.26 already ships Catppuccin. The Mac `config/bat/themes/` files and `config/bat/syntaxes/` (empty) are not ported. `FD_OPTIONS` and the `FZF_*` variables already live in `~/.bashrc`.
 
 Grow this tree when a setting actually diverges. Do not snapshot all of `~/.config`.
