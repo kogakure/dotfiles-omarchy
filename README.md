@@ -48,6 +48,7 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `ripgrep` | `~/.config/ripgrep/ripgreprc` | Personal types and `--smart-case`. `RIPGREP_CONFIG_PATH` is set in `~/.bashrc`. |
 | `gh` | `~/.config/gh/config.yml` | `git_protocol: https` and the `co`, `ds`, and `me` aliases. `hosts.yml` stays the file `gh auth login` wrote. |
 | `gh-dash` | `~/.config/gh-dash/config.yml` | PR and issue sections from the Mac. `repoPaths` use `~/Code/personal` and `~/Code/work`. |
+| `yazi` | `~/.config/yazi/yazi.toml` | The TUI file manager. Natural sort only. Nautilus stays the GUI file manager. |
 
 ## Extra packages
 
@@ -106,5 +107,6 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - Herdr plugin checkouts under `~/.config/herdr/plugins/github/` (SI-140). `./install.sh` installs the two repos in `packages/herdr-plugins`. The Mac prefix (`Ctrl+B`), Homebrew pane commands, and `official.browser` are not ported.
 - The rest of `~/.config/nvim` (SI-143). omarchy-nvim owns the seed, `lazyvim.json`, and `lua/plugins/theme.lua` (a relative symlink to the current theme's `neovim.lua`). Do not replace that tree. Not ported: colorschemes, the telescope pile, snacks explorer, mini-animate, smear-cursor, iA Writer, smart-splits, and the disabled highlight-undo plugin.
 - Bat's Catppuccin themes (SI-145). Omarchy sets `BAT_THEME=ansi`, and bat 0.26 already ships Catppuccin. The Mac `config/bat/themes/` files and `config/bat/syntaxes/` (empty) are not ported. `FD_OPTIONS` and the `FZF_*` variables already live in `~/.bashrc`.
+- `lf` and `superfile` configs (SI-147). yazi is the one TUI file manager. `lf` is not installed: `mimeopen` is missing, and `lfrc` wants `fzf-tmux` plus the fisher `lf-icons` plugin. `superfile` stays a mise pin, but its config is upstream defaults plus Catppuccin. `~/.config/superfile/theme` is superfile's own theme directory.
 
 Grow this tree when a setting actually diverges. Do not snapshot all of `~/.config`.
