@@ -1,0 +1,5 @@
+nvim/.config/nvim/dictionary/de_neu.txt linguist-vendored
+nvim/.config/nvim/dictionary/en_us.txt linguist-vendored
+nvim/.config/nvim/thesaurus/de_openthesaurus.txt linguist-vendored
+nvim/.config/nvim/spell/*.spl binary
+nvim/.config/nvim/spell/*.sug binary
