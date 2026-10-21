@@ -1,0 +1,5 @@
+// Local options on top of the system evdev rules.
+! include %S/evdev
+
+! option = symbols
+  umlaut:ae = +umlaut(ae)
