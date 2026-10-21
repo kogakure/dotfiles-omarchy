@@ -1,0 +1,6 @@
+# tdi.worktree-setup config
+# Runs on herdr's worktree.created event.
+
+# Applies to every repo that has no more specific [[project]] entry below.
+[default]
+steps = ["$HOME/dotfiles/bin/node-install"]

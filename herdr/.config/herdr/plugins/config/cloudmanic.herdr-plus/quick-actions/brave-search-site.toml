@@ -1,0 +1,4 @@
+name = "Brave Search"
+description = "Open https://search.brave.com"
+type = "command"
+command = "xdg-open https://search.brave.com"

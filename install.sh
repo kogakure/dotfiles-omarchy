@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOST="${DOTFILES_HOST:-$(hostname -s)}"
 TARGET="${HOME}"
-PACKAGES=(hypr git bash env omarchy mise ghostty atuin)
+PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr)
 
 need_cmd() {
   command -v "$1" >/dev/null || {
@@ -69,11 +69,38 @@ stow_package() {
   stow -v -d "$dir" -t "$TARGET" -R "$pkg"
 }
 
+# herdr installs plugin checkouts under ~/.config/herdr/plugins/github.
+# If that directory does not exist yet, stow would link the whole plugins
+# tree into this repo and the next plugin install would write into git.
+mkdir -p "$TARGET/.config/herdr/plugins/github" "$TARGET/.config/herdr/plugins/config"
+
 init_private
 
 for pkg in "${PACKAGES[@]}"; do
   stow_package "$ROOT" "$pkg"
 done
+
+install_herdr_plugins() {
+  local list="$ROOT/packages/herdr-plugins"
+  [[ -f "$list" ]] || return 0
+  if ! command -v herdr >/dev/null; then
+    echo "herdr is not on PATH; skipped plugin install. Run mise install, then ./install.sh again." >&2
+    return 0
+  fi
+
+  local installed line spec
+  installed="$(herdr plugin list 2>/dev/null || true)"
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    spec="${line%%#*}"
+    spec="${spec#"${spec%%[![:space:]]*}"}"
+    spec="${spec%"${spec##*[![:space:]]}"}"
+    [[ -z "$spec" ]] && continue
+    if [[ "$installed" == *"$spec"* ]]; then
+      continue
+    fi
+    herdr plugin install "$spec" --yes
+  done < "$list"
+}
 
 # This checkout lives outside the includeIf directories, so without a local
 # include, commits here have no identity. Signing stays off until SI-152:
@@ -95,5 +122,8 @@ fi
 
 chmod +x "$ROOT/omarchy/.config/omarchy/hooks/post-update.d/dotfiles-status" 2>/dev/null || true
 chmod +x "$ROOT/packages/snapshot" 2>/dev/null || true
+chmod +x "$ROOT/bin/node-install" 2>/dev/null || true
+
+install_herdr_plugins
 
 echo "Stowed packages into $TARGET"
