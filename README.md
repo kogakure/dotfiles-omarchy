@@ -50,6 +50,7 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `gh-dash` | `~/.config/gh-dash/config.yml` | PR and issue sections from the Mac. `repoPaths` use `~/Code/personal` and `~/Code/work`. |
 | `yazi` | `~/.config/yazi/yazi.toml` | The TUI file manager. Natural sort only. Nautilus stays the GUI file manager. |
 | `lazygit` | `~/.config/lazygit/config.yml` | Delta diffs (Dracula, same as git) and `overrideGpg`. Omarchy's shipped file is empty. |
+| `jj` | `~/.jjconfig.toml` | Default command `log`, pager off, lazyjj color-words diffs. Immutable heads are `main@origin` and `master@origin`. Name, email and the signing key are the vault symlink `~/.config/jj/config.toml`. |
 
 ## Extra packages
 
@@ -85,7 +86,11 @@ Edit the live files (`Super + Space` → Setup, or `$EDITOR ~/.config/hypr/...`)
 - `~/dotfiles/private/git/config-personal`
 - `~/dotfiles/private/git/config-work`
 
-Those paths are in the public git config. The files stay in the submodule. Nothing else in the vault is wired up. jj, GPG, agent configs and Espanso each get their own links when those are ported. Nested submodules inside the vault (agent skills, Claude plugins) are not initialized here.
+Those paths are in the public git config. The files stay in the submodule.
+
+jj reads `~/dotfiles/private/jj/config.toml` through `~/.config/jj/config.toml`. `./install.sh` creates that symlink when the vault file is present. It is not stowed: a link that points back into this repo gets folded on the next restow. The public file is `~/.jjconfig.toml`.
+
+Nothing else in the vault is wired up. GPG, agent configs and Espanso each get their own links when those are ported. Nested submodules inside the vault (agent skills, Claude plugins) are not initialized here.
 
 Repos under `~/Code/personal` and `~/Code/work` pick up the matching identity file. `~/dotfiles` is outside those trees, so `install.sh` points this checkout at `config-personal` and leaves `commit.gpgsign` off. Anywhere else, run `glu` once in that repo:
 
@@ -101,6 +106,7 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - `~/.local/state/omarchy/current` (generated theme copies)
 - SSH private keys, `~/.config/gh/hosts.yml` (SI-146). Login stays in the keyring. The Mac `gh.fish` account switcher is not ported: this machine has one github.com account and `GITHUB_TOKEN` is unset. `./install.sh` installs the eight repos in `packages/gh-extensions`; those checkouts are not tracked.
 - Git name, email and signing key (those live in `private/git/`)
+- jj name, email and signing key (those live in `private/jj/`). `signing.behavior` is `own` and the backend is `gpg`, so `jj git init` and any new commit try to sign. This machine has no secret key until SI-152, and that init fails with `No secret key` until then.
 - Browser profiles
 - Hook `*.sample` files Omarchy ships
 - `~/.config/mise/config.toml` (Omarchy writes this via `mise use -g`)
@@ -110,5 +116,6 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - Bat's Catppuccin themes (SI-145). Omarchy sets `BAT_THEME=ansi`, and bat 0.26 already ships Catppuccin. The Mac `config/bat/themes/` files and `config/bat/syntaxes/` (empty) are not ported. `FD_OPTIONS` and the `FZF_*` variables already live in `~/.bashrc`.
 - `lf` and `superfile` configs (SI-147). yazi is the one TUI file manager. `lf` is not installed: `mimeopen` is missing, and `lfrc` wants `fzf-tmux` plus the fisher `lf-icons` plugin. `superfile` stays a mise pin, but its config is upstream defaults plus Catppuccin. `~/.config/superfile/theme` is superfile's own theme directory.
 - Lazydocker config, and two lazygit commands (SI-148). The Mac lazydocker file is an older upstream sample (`open`, `docker-compose`). lazydocker 0.25.2 already uses `xdg-open` and `docker compose`. Commitizen (`git cz`) is not installed. Lazygit key `W` would replace the diffing menu; commit-without-hooks is already `w`.
+- The Mac `[revsets] immutable` key (SI-149). jj 0.45 ignores it. The same bookmarks are `revset-aliases."immutable_heads()"`, wrapped in `present()` so a repo that lacks one of them can still run `jj log`. That replaces `builtin_immutable_heads()` rather than adding to it.
 
 Grow this tree when a setting actually diverges. Do not snapshot all of `~/.config`.

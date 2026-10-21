@@ -1,0 +1,22 @@
+# The identity — [user] and the signing key — lives in private/jj/config.toml,
+# linked to ~/.config/jj/config.toml. jj reads both that and ~/.jjconfig.toml
+# (this file) and merges them, with the private file last.
+
+[ui]
+default-command = "log"
+paginate = "never"
+
+[lazyjj]
+diff-format = "color-words"
+
+# The Mac file set [revsets] immutable to this. jj 0.45 never reads that key;
+# immutable_heads() is what protects commits. present() keeps `jj log` working
+# when a repo has only one of the two bookmarks. This replaces
+# builtin_immutable_heads() (trunk, tags, untracked remotes).
+[revset-aliases]
+"immutable_heads()" = "present(main@origin) | present(master@origin)"
+
+[signing]
+backend = "gpg"
+behavior = "own"
+# key = … see private/jj/config.toml
