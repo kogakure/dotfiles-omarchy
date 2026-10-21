@@ -1,0 +1,13 @@
+{
+  "theme": "omarchy-system",
+  "defaultProvider": "anthropic",
+  "defaultThinkingLevel": "high",
+  "hideThinkingBlock": false,
+  "packages": [
+    "npm:@nqbao/pi-sandbox",
+    "npm:pi-defender",
+    "npm:@plannotator/pi-extension",
+    "npm:@gotgenes/pi-anthropic-auth"
+  ],
+  "tuiMode": "fullscreen"
+}
