@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# Lint install.sh and the shell hooks with ShellCheck and shfmt.
+#
+# One entry point for the pre-commit hook and CI, so both check the same
+# files. Resolves the repo root itself and does not depend on the caller's cwd.
+#
+# Usage: dotfiles-lint [--staged] [--strict]
+#
+#   --staged  only files staged for commit (the pre-commit hook)
+#   --strict  a missing linter is a failure; CI uses this
+#
+# Not the macOS suite. No fish/zsh/POSIX source test, no baseline, no Justfile.
+
+set -uo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT" || exit 1
+
+STAGED=0
+STRICT=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --staged) STAGED=1 ;;
+    --strict) STRICT=1 ;;
+    -h | --help)
+      sed -n '2,/^$/p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    *)
+      printf 'dotfiles-lint: unknown argument: %s\n' "$1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+# Tracked shell that is allowed to run on its own. Sourced function snippets
+# under bash/.functions are not in this list.
+shell_sources() {
+  local f
+  for f in \
+    install.sh \
+    bin/dotfiles-lint \
+    .githooks/pre-commit \
+    omarchy/.config/omarchy/hooks/post-update.d/dotfiles-status; do
+    [[ -f "$f" ]] || continue
+    printf '%s\n' "$f"
+  done
+}
+
+FILES=()
+read_files() {
+  local line
+  FILES=()
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    FILES+=("$line")
+  done
+}
+
+select_files() {
+  if [[ "$STAGED" -eq 0 ]]; then
+    shell_sources
+    return 0
+  fi
+  comm -12 <(shell_sources | sort) <(git diff --cached --name-only --diff-filter=ACMR | sort)
+}
+
+missing_tool() {
+  if [[ "$STRICT" -eq 1 ]]; then
+    printf 'FAIL %s: %s not found\n' "$1" "$2" >&2
+    return 1
+  fi
+  printf 'skip %s: %s not found\n' "$1" "$2" >&2
+  return 0
+}
+
+failed=0
+
+check_shellcheck() {
+  if ! command -v shellcheck >/dev/null 2>&1; then
+    missing_tool shellcheck shellcheck || failed=1
+    return
+  fi
+  read_files < <(select_files)
+  if [[ ${#FILES[@]} -eq 0 ]]; then
+    printf 'ok shellcheck (no files)\n'
+    return
+  fi
+  local findings
+  findings="$(shellcheck -x -s bash -f gcc "${FILES[@]}" 2>&1)" || true
+  if [[ -n "$findings" ]]; then
+    printf '%s\n' "$findings"
+    printf 'FAIL shellcheck\n' >&2
+    failed=1
+    return
+  fi
+  printf 'ok shellcheck (%s file(s))\n' "${#FILES[@]}"
+}
+
+check_shfmt() {
+  if ! command -v shfmt >/dev/null 2>&1; then
+    missing_tool shfmt shfmt || failed=1
+    return
+  fi
+  read_files < <(select_files)
+  if [[ ${#FILES[@]} -eq 0 ]]; then
+    printf 'ok shfmt (no files)\n'
+    return
+  fi
+  # -i 2 matches install.sh. -ci indents case bodies, which that file already does.
+  local diff
+  diff="$(shfmt -d -i 2 -ci "${FILES[@]}" 2>&1)" || true
+  if [[ -n "$diff" ]]; then
+    printf '%s\n' "$diff"
+    printf 'FAIL shfmt\n' >&2
+    failed=1
+    return
+  fi
+  printf 'ok shfmt (%s file(s))\n' "${#FILES[@]}"
+}
+
+check_shellcheck
+check_shfmt
+exit "$failed"

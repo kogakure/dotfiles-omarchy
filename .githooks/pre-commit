@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Lint the shell files staged for this commit.
+#
+# install.sh sets core.hooksPath to .githooks. Skip once with:
+#   git commit --no-verify
+#
+# Fails open when shellcheck or shfmt is not on PATH. Both come from mise, so
+# a PATH regression is exactly when a commit still has to be possible. The
+# hook blocks on findings, not on missing tools.
+
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+LINTER="$REPO_ROOT/bin/dotfiles-lint"
+
+if [[ ! -x "$LINTER" ]]; then
+  printf 'pre-commit: %s missing or not executable, skipping lint (fail-open).\n' "$LINTER" >&2
+  exit 0
+fi
+
+if ! command -v shellcheck >/dev/null 2>&1 || ! command -v shfmt >/dev/null 2>&1; then
+  printf 'pre-commit: shellcheck/shfmt not on PATH, skipping lint (fail-open).\n' >&2
+  printf 'pre-commit: restore them with "mise install".\n' >&2
+  exit 0
+fi
+
+if ! "$LINTER" --staged; then
+  printf '\npre-commit: lint failed. Fix the findings, or bypass with:\n' >&2
+  printf '  git commit --no-verify\n' >&2
+  exit 1
+fi
