@@ -55,3 +55,13 @@
 -- Enable touchpad gestures for moving focus (helpful on scrolling layout).
 -- hl.gesture({ fingers = 3, direction = "left", action = function() hl.dispatch(hl.dsp.focus({ direction = "l" })) end })
 -- hl.gesture({ fingers = 3, direction = "right", action = function() hl.dispatch(hl.dsp.focus({ direction = "r" })) end })
+
+-- Right Alt + a/o/u types ä/ö/ü, and with Shift types Ä/Ö/Ü.
+-- Left Alt stays Alt, so Alt+Tab and menu accelerators are unchanged.
+-- Setting kb_options here replaces Omarchy's string. Keep Caps Lock as
+-- Compose, and both Shifts as the Caps Lock that cancels itself.
+hl.config({
+  input = {
+    kb_options = "compose:caps,shift:both_capslock_cancel,umlaut:ae",
+  },
+})

@@ -32,6 +32,7 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | Package | Lives at | Notes |
 |---|---|---|
 | `hypr` | `~/.config/hypr/*.lua` | Shared Hyprland overrides. `hyprland.lua` reclaims workspaces when a display unplugs. |
+| `xkb` | `~/.config/xkb/` | Right Alt + a/o/u types ä/ö/ü (Shift: Ä/Ö/Ü). Left Alt stays Alt, so Alt+Tab is unchanged. Selected by the `umlaut:ae` option in `hypr/input.lua`. |
 | `hosts/omarchy` | `~/.config/hypr/monitors.lua` | This machine: laptop + Studio Display. |
 | `git` | `~/.config/git/config`, `ignore` | No identity. Includes Omarchy's shipped git config, then personal or work identity when the repo is under `~/Code/personal` or `~/Code/work`. `gh` credentials, hunk/delta, extra aliases. Global gitignore. |
 | `private` | not stowed | Submodule of `kogakure/vault` (same repo as the macOS dotfiles). Git reads the identity files from here; they are not copied into `~/.config`. |
