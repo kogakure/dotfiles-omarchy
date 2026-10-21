@@ -7,7 +7,7 @@ HOST="${DOTFILES_HOST:-$(hostname -s)}"
 TARGET="${HOME}"
 # nvim is stowed separately, and only after omarchy-nvim-setup has seeded
 # ~/.config/nvim. Creating that directory first would make setup skip the seed.
-PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper)
+PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper bat ripgrep)
 
 need_cmd() {
   command -v "$1" >/dev/null || {

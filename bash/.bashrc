@@ -32,9 +32,11 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
+# fd and fzf (SI-145). These landed with the env port. The Alt-C preview uses
+# eza because tree is not installed. Ripgrep only reads a config via this path.
+export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/ripgreprc"
 export FD_OPTIONS="--follow --exclude .git --exclude node_modules"
 export FZF_ALT_C_COMMAND="fd --type d ${FD_OPTIONS} --color=never --hidden"
-# eza, not tree: tree is not installed, eza is the listing tool.
 export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} | head -50'"
 export FZF_CTRL_R_OPTS="--reverse"
 export FZF_CTRL_T_COMMAND="git ls-files --cached --others --exclude-standard | fd --hidden --type f --type l ${FD_OPTIONS}"
