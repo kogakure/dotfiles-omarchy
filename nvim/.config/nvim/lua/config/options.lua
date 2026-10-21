@@ -32,4 +32,16 @@ vim.opt.complete:append({ "i", "k", "s", "kspell" })
 -- Only the project root should be the root.
 vim.g.root_spec = { ".git" }
 
--- Spell, dictionary and thesaurus paths are SI-144. Not set here.
+-- Personal word lists live under ~/.config/nvim, which is on the runtimepath,
+-- so the de/en spell files there are found without an extra path. A literal
+-- "~/" in 'spellfile' is not expanded and zg cannot write it.
+vim.opt.spellfile:append(vim.fn.expand("~/.config/nvim/spell/en.utf-8.add"))
+vim.opt.dictionary:append({
+  vim.fn.expand("~/.config/nvim/dictionary/de_user.txt"),
+  vim.fn.expand("~/.config/nvim/dictionary/de_neu.txt"),
+  vim.fn.expand("~/.config/nvim/dictionary/en_us.txt"),
+})
+vim.opt.thesaurus:append({
+  vim.fn.expand("~/.config/nvim/thesaurus/de_user.txt"),
+  vim.fn.expand("~/.config/nvim/thesaurus/de_openthesaurus.txt"),
+})
