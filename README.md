@@ -51,6 +51,8 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `yazi` | `~/.config/yazi/yazi.toml` | The TUI file manager. Natural sort only. Nautilus stays the GUI file manager. |
 | `lazygit` | `~/.config/lazygit/config.yml` | Delta diffs (Dracula, same as git) and `overrideGpg`. Omarchy's shipped file is empty. |
 | `jj` | `~/.jjconfig.toml` | Default command `log`, pager off, lazyjj color-words diffs. Immutable heads are `main@origin` and `master@origin`. Name, email and the signing key are the vault symlink `~/.config/jj/config.toml`. |
+| `opencode` | `~/.config/opencode/` | Permissions, MCP, compaction, three plugins, slash commands, and the gh-stack skill. Theme stays `system`. Herdr's own files stay where Herdr wrote them. |
+| `pi` | `~/.pi/` | Sandbox, four extensions, and the packages pi 0.85.1 can load. Theme stays `omarchy-system`. Personal skills are symlinks into `private/agents/skills`. |
 
 ## Extra packages
 
@@ -90,7 +92,9 @@ Those paths are in the public git config. The files stay in the submodule.
 
 jj reads `~/dotfiles/private/jj/config.toml` through `~/.config/jj/config.toml`. `./install.sh` creates that symlink when the vault file is present. It is not stowed: a link that points back into this repo gets folded on the next restow. The public file is `~/.jjconfig.toml`.
 
-Nothing else in the vault is wired up. GPG, agent configs and Espanso each get their own links when those are ported. Nested submodules inside the vault (agent skills, Claude plugins) are not initialized here.
+Pi reads its personal skills through symlinks in `~/.pi/agent/skills` that point at `private/agents/skills`. The skill files stay in the submodule.
+
+Claude, Codex and Grok each have a `personal` and a `work` tree in the vault, shared with the Macs and not split by host. Those trees are not linked. GPG and Espanso still get their own links when those are ported. Nested submodules inside the vault (agent skills, Claude plugins) are not initialized here.
 
 Repos under `~/Code/personal` and `~/Code/work` pick up the matching identity file. `~/dotfiles` is outside those trees, so `install.sh` points this checkout at `config-personal` and leaves `commit.gpgsign` off. Anywhere else, run `glu` once in that repo:
 
@@ -117,5 +121,9 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - `lf` and `superfile` configs (SI-147). yazi is the one TUI file manager. `lf` is not installed: `mimeopen` is missing, and `lfrc` wants `fzf-tmux` plus the fisher `lf-icons` plugin. `superfile` stays a mise pin, but its config is upstream defaults plus Catppuccin. `~/.config/superfile/theme` is superfile's own theme directory.
 - Lazydocker config, and two lazygit commands (SI-148). The Mac lazydocker file is an older upstream sample (`open`, `docker-compose`). lazydocker 0.25.2 already uses `xdg-open` and `docker compose`. Commitizen (`git cz`) is not installed. Lazygit key `W` would replace the diffing menu; commit-without-hooks is already `w`.
 - The Mac `[revsets] immutable` key (SI-149). jj 0.45 ignores it. The same bookmarks are `revset-aliases."immutable_heads()"`, wrapped in `present()` so a repo that lacks one of them can still run `jj log`. That replaces `builtin_immutable_heads()` rather than adding to it.
+- Claude, Codex and Grok backup scripts (SI-150). They write into `private/{claude,codex,grok}/{personal,work}`, which the Macs already use, and Codex skills are synced with `rsync --delete`. A Linux run would mix the two hosts. The scripts also use macOS `stat -f`. Restoring those trees would replace Omarchy's Herdr hooks and theme with Mac paths (`/Users`, Codex Computer Use). Not linked.
+- Herdr-managed agent files (SI-150). `herdr-agent-state` and `herdr-tui-session` say Herdr overwrites them. This machine's copies stay (opencode integration 10, pi integration 8). The Mac copies are newer and are not ported.
+- OpenCode's Warp plugin, the osascript notifier, `tui.json` / `cli.json`, the two ocx profiles, and the vendored wakatime and kdco bundles (SI-150). opencode 1.18.29 does not read `tui.json` or `cli.json`. The profiles point at a missing `claude-mem.js` and repeat the root file. Theme stays `system`.
+- Pi's Catppuccin theme, MLX model entry, and model ids `claude-opus-5-5`, `claude-sonnet-5-5`, and `grok-4.7` (SI-150). Theme stays `omarchy-system`. pi 0.85.1 warns that none of those model ids exist. `pi-subagents` and `pi-agent-browser-native` fail to load on this pi, so they are not in `packages`. `pi/patterns.yaml` is the upstream defender sample and is overwritten on install.
 
 Grow this tree when a setting actually diverges. Do not snapshot all of `~/.config`.
