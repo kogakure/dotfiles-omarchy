@@ -1,0 +1,15 @@
+# GitHub CLI extensions installed by ./install.sh.
+# One owner/repo per line, as `gh extension install` takes it.
+# `#` comments and blank lines are ignored.
+#
+# The checkouts live in gh's extension directory, not in this repo.
+# gh-dash's settings are the gh-dash package.
+
+dlvhdr/gh-dash
+jrnxf/gh-eco
+gennaro-tedesco/gh-f
+github/gh-stack
+yusukebe/gh-markdown-preview
+meiji163/gh-notify
+seachicken/gh-poi
+gennaro-tedesco/gh-s

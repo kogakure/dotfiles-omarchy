@@ -46,6 +46,8 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `harper` | `~/.config/harper-ls/dictionary.txt` | Harper's user dictionary (`dictionary.txt` under `$XDG_CONFIG_HOME/harper-ls`). One personal word. Harper itself is not installed here yet. |
 | `bat` | `~/.config/bat/config` | Style, pager, wrap, and syntax maps from the Mac. Theme is `ansi`, not Catppuccin. |
 | `ripgrep` | `~/.config/ripgrep/ripgreprc` | Personal types and `--smart-case`. `RIPGREP_CONFIG_PATH` is set in `~/.bashrc`. |
+| `gh` | `~/.config/gh/config.yml` | `git_protocol: https` and the `co`, `ds`, and `me` aliases. `hosts.yml` stays the file `gh auth login` wrote. |
+| `gh-dash` | `~/.config/gh-dash/config.yml` | PR and issue sections from the Mac. `repoPaths` use `~/Code/personal` and `~/Code/work`. |
 
 ## Extra packages
 
@@ -95,7 +97,7 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 
 - `/usr/share/omarchy`
 - `~/.local/state/omarchy/current` (generated theme copies)
-- SSH private keys, `~/.config/gh/hosts.yml`
+- SSH private keys, `~/.config/gh/hosts.yml` (SI-146). Login stays in the keyring. The Mac `gh.fish` account switcher is not ported: this machine has one github.com account and `GITHUB_TOKEN` is unset. `./install.sh` installs the eight repos in `packages/gh-extensions`; those checkouts are not tracked.
 - Git name, email and signing key (those live in `private/git/`)
 - Browser profiles
 - Hook `*.sample` files Omarchy ships

@@ -7,7 +7,7 @@ HOST="${DOTFILES_HOST:-$(hostname -s)}"
 TARGET="${HOME}"
 # nvim is stowed separately, and only after omarchy-nvim-setup has seeded
 # ~/.config/nvim. Creating that directory first would make setup skip the seed.
-PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper bat ripgrep)
+PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper bat ripgrep gh gh-dash)
 
 need_cmd() {
   command -v "$1" >/dev/null || {
@@ -114,6 +114,28 @@ install_herdr_plugins() {
   done < "$list"
 }
 
+install_gh_extensions() {
+  local list="$ROOT/packages/gh-extensions"
+  [[ -f "$list" ]] || return 0
+  if ! command -v gh >/dev/null; then
+    echo "gh is not on PATH; skipped extension install. Run mise install, then ./install.sh again." >&2
+    return 0
+  fi
+
+  local installed line spec
+  installed="$(gh extension list 2>/dev/null || true)"
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    spec="${line%%#*}"
+    spec="${spec#"${spec%%[![:space:]]*}"}"
+    spec="${spec%"${spec##*[![:space:]]}"}"
+    [[ -z "$spec" ]] && continue
+    if [[ "$installed" == *"$spec"* ]]; then
+      continue
+    fi
+    gh extension install "$spec"
+  done < "$list"
+}
+
 # This checkout lives outside the includeIf directories, so without a local
 # include, commits here have no identity. Signing stays off until SI-152:
 # config-personal turns it on, and a local value beats the global override.
@@ -137,5 +159,6 @@ chmod +x "$ROOT/packages/snapshot" 2>/dev/null || true
 chmod +x "$ROOT/bin/node-install" 2>/dev/null || true
 
 install_herdr_plugins
+install_gh_extensions
 
 echo "Stowed packages into $TARGET"
