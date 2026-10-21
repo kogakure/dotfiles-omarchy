@@ -7,7 +7,7 @@ HOST="${DOTFILES_HOST:-$(hostname -s)}"
 TARGET="${HOME}"
 # nvim is stowed separately, and only after omarchy-nvim-setup has seeded
 # ~/.config/nvim. Creating that directory first would make setup skip the seed.
-PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper bat ripgrep gh gh-dash yazi lazygit jj opencode pi tools)
+PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper bat ripgrep gh gh-dash yazi lazygit jj opencode pi tools gnupg)
 
 need_cmd() {
   command -v "$1" >/dev/null || {
@@ -78,9 +78,42 @@ mkdir -p "$TARGET/.config/herdr/plugins/github" "$TARGET/.config/herdr/plugins/c
 
 init_private
 
+# Secret keys stay in the vault. --batch so a locked key does not open a
+# pinentry during install. Import is idempotent. The archive/ copy is an old
+# key and is not imported. A missing backup skips.
+import_gpg_keys() {
+  local dir="$ROOT/private/gpg"
+  local log
+  log="$(mktemp)"
+
+  if [[ ! -s "$dir/private_keys.asc" || ! -s "$dir/public_keys.asc" || ! -s "$dir/ownertrust.txt" ]]; then
+    echo "private/gpg key backup is missing; skipped GPG key import" >&2
+    rm -f "$log"
+    return 0
+  fi
+  if ! command -v gpg >/dev/null; then
+    echo "gpg is not on PATH; skipped GPG key import" >&2
+    rm -f "$log"
+    return 0
+  fi
+
+  if ! gpg --batch --quiet --import "$dir/public_keys.asc" >>"$log" 2>&1 \
+    || ! gpg --batch --quiet --import "$dir/private_keys.asc" >>"$log" 2>&1 \
+    || ! gpg --batch --quiet --import-ownertrust "$dir/ownertrust.txt" >>"$log" 2>&1; then
+    echo "GPG key import failed. Log: $log" >&2
+    return 1
+  fi
+  rm -f "$log"
+  gpgconf --reload gpg-agent >/dev/null 2>&1 || true
+  gpgconf --reload dirmngr >/dev/null 2>&1 || true
+  echo "Imported GPG keys from private/gpg"
+}
+
 for pkg in "${PACKAGES[@]}"; do
   stow_package "$ROOT" "$pkg"
 done
+
+import_gpg_keys
 
 # theme.lua is not in this package. It stays the relative symlink that
 # omarchy-nvim-setup writes into the current theme. plugins/ already exists
@@ -137,15 +170,20 @@ install_gh_extensions() {
 }
 
 # This checkout lives outside the includeIf directories, so without a local
-# include, commits here have no identity. Signing stays off until SI-152:
-# config-personal turns it on, and a local value beats the global override.
+# include, commits here have no identity. config-personal turns signing on.
 # No symlink into ~/.config/git: stow treats a link that points back into
 # this repo as one of its own and folds the directory on the next restow.
+# The local commit.gpgsign false from before SI-152 beats that include, so
+# drop it once a secret key is present. Keep it when the vault backup is not.
 if [[ -e "$ROOT/.git" && -f "$ROOT/private/git/config-personal" ]]; then
   # Quoted on purpose: git expands ~ in include.path. Leave it for git.
   # shellcheck disable=SC2088
   git -C "$ROOT" config --local include.path '~/dotfiles/private/git/config-personal'
-  git -C "$ROOT" config --local commit.gpgsign false
+  if gpg --batch --list-secret-keys --with-colons 2>/dev/null | grep -q '^sec:'; then
+    git -C "$ROOT" config --local --unset commit.gpgsign || true
+  else
+    git -C "$ROOT" config --local commit.gpgsign false
+  fi
 fi
 
 # Same constraint for jj. The public file is stowed as ~/.jjconfig.toml.

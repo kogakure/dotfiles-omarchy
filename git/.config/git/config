@@ -26,11 +26,10 @@
 [includeIf "gitdir:~/Code/work/"]
 	path = ~/dotfiles/private/git/config-work
 
-# config-personal sets commit.gpgsign. This machine has no secret key yet
-# (SI-152). A later value wins over the included one, so commits stay
-# unsigned. Remove this block once the key is imported.
-[commit]
-	gpgsign = false
+# config-personal and config-work set commit.gpgsign. The override that forced
+# it off is gone: ./install.sh imports the secret key from private/gpg (SI-152).
+# A checkout that has not imported a key still gets a local commit.gpgsign
+# false from install.sh, which beats the include.
 
 # Resolved through PATH, not by absolute path. `gh auth setup-git` writes a
 # machine path that goes stale the moment gh is a mise tool (SI-118).
