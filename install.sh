@@ -7,7 +7,7 @@ HOST="${DOTFILES_HOST:-$(hostname -s)}"
 TARGET="${HOME}"
 # nvim is stowed separately, and only after omarchy-nvim-setup has seeded
 # ~/.config/nvim. Creating that directory first would make setup skip the seed.
-PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper bat ripgrep gh gh-dash yazi lazygit)
+PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper bat ripgrep gh gh-dash yazi lazygit jj)
 
 need_cmd() {
   command -v "$1" >/dev/null || {
@@ -147,6 +147,25 @@ if [[ -e "$ROOT/.git" && -f "$ROOT/private/git/config-personal" ]]; then
   git -C "$ROOT" config --local include.path '~/dotfiles/private/git/config-personal'
   git -C "$ROOT" config --local commit.gpgsign false
 fi
+
+# Same constraint for jj. The public file is stowed as ~/.jjconfig.toml.
+# The vault file is only the name, email and signing key, so it is a direct
+# symlink. Stow would fold ~/.config/jj if that link pointed back here.
+link_jj_identity() {
+  local src="$ROOT/private/jj/config.toml"
+  local dest="$TARGET/.config/jj/config.toml"
+
+  if [[ ! -f "$src" ]]; then
+    echo "private/jj/config.toml is missing; skipped the jj identity link" >&2
+    return 0
+  fi
+
+  mkdir -p "$TARGET/.config/jj"
+  backup_if_conflict "$dest" "$src"
+  ln -sfn "$src" "$dest"
+}
+
+link_jj_identity
 
 if [[ -d "$ROOT/hosts/$HOST" ]]; then
   stow_package "$ROOT/hosts" "$HOST"
