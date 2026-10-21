@@ -7,7 +7,7 @@ HOST="${DOTFILES_HOST:-$(hostname -s)}"
 TARGET="${HOME}"
 # nvim is stowed separately, and only after omarchy-nvim-setup has seeded
 # ~/.config/nvim. Creating that directory first would make setup skip the seed.
-PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper bat ripgrep gh gh-dash yazi lazygit jj opencode pi tools gnupg)
+PACKAGES=(hypr git bash env omarchy mise ghostty atuin herdr harper bat ripgrep gh gh-dash yazi lazygit jj opencode pi tools gnupg espanso)
 
 need_cmd() {
   command -v "$1" >/dev/null || {
@@ -225,5 +225,26 @@ chmod +x "$ROOT/bin/node-install" 2>/dev/null || true
 
 install_herdr_plugins
 install_gh_extensions
+
+# espanso-wayland is an AUR package, not a mise pin. Register the user
+# service when the binary is already installed; skip cleanly otherwise.
+# `espanso status` exits 0 only when the worker is running. "not running"
+# still contains the word running, so match the exit code, not the text.
+start_espanso() {
+  if ! command -v espanso >/dev/null; then
+    echo "espanso is not on PATH; skipped service register. Install espanso-wayland, then ./install.sh again." >&2
+    return 0
+  fi
+  espanso service register
+  if ! espanso status >/dev/null 2>&1; then
+    # The first start can sit on the welcome window and time out even
+    # though the worker is up. Do not fail the rest of install for that.
+    if ! espanso start; then
+      echo "espanso start did not report ready. Check 'espanso status'." >&2
+    fi
+  fi
+}
+
+start_espanso
 
 echo "Stowed packages into $TARGET"
