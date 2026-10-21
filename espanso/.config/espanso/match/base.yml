@@ -1,0 +1,16 @@
+# Entry point for the snippets. Every *.yml in this directory is loaded
+# automatically, except files starting with "_" (see config/macos.yml).
+#
+# Personal and financial snippets live in the private submodule, not here.
+# Stow links this file into ~/.config/espanso/match/base.yml; the real path is
+# ~/dotfiles/espanso/.config/espanso/match/base.yml. Espanso canonicalizes
+# that path, so four ".." segments reach the repo root (the macOS tree used
+# three, because its config directory sits one level higher). On a checkout
+# without private/ these imports fail to load and everything else keeps working.
+#
+# On macOS Raycast is still the expander and espanso is not running; this config
+# is the backup. On Linux espanso is the primary snippet engine.
+
+imports:
+  - "../../../../private/espanso/personal.yml"
+  - "../../../../private/espanso/finance.yml"

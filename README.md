@@ -55,6 +55,7 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `pi` | `~/.pi/` | Sandbox, four extensions, and the packages pi 0.85.1 can load. Theme stays `omarchy-system`. Personal skills are symlinks into `private/agents/skills`. |
 | `tools` | `~/.editorconfig`, `~/.markdownlint.yaml`, `~/.ctags`, `~/.curlrc`, `~/.gemrc`, `~/.ackrc`, `~/.agignore`, `~/.wgetrc`, `~/.gitmux.conf`, `~/.default-gems`, `~/.default-npm-packages`, `~/.default-python-packages` | Small root configs from the Mac. ack, ag and wget use the filenames those tools read. gitmux is not called from Omarchy's tmux. mise reads the three package lists the next time it installs Ruby, Node or Python. |
 | `gnupg` | `~/.gnupg/gpg.conf`, `dirmngr.conf`, `gpg-agent.conf` | `gpg.conf` and `dirmngr.conf` are the Mac files. Pinentry is `/usr/bin/pinentry-gnome3`, not `pinentry-mac`. `./install.sh` imports the vault keyring. SSH stays with ssh-agent. |
+| `espanso` | `~/.config/espanso/` | Snippets from the Mac. Search is `ALT+SPACE` (Omarchy's menu is `SUPER+SPACE`). `keyboard_layout` is English (US), the layout Hyprland is using; Colemak-DH would misread these keys. macOS-only matches stay behind `filter_os: macos`. Private snippets are imported from the vault. The binary is the AUR package `espanso-wayland`. |
 
 ## Extra packages
 
@@ -102,7 +103,9 @@ jj reads `~/dotfiles/private/jj/config.toml` through `~/.config/jj/config.toml`.
 
 Pi reads its personal skills through symlinks in `~/.pi/agent/skills` that point at `private/agents/skills`. The skill files stay in the submodule.
 
-Claude, Codex and Grok each have a `personal` and a `work` tree in the vault, shared with the Macs and not split by host. Those trees are not linked. Espanso still gets its own links when that is ported. Nested submodules inside the vault (agent skills, Claude plugins) are not initialized here.
+Claude, Codex and Grok each have a `personal` and a `work` tree in the vault, shared with the Macs and not split by host. Those trees are not linked. Nested submodules inside the vault (agent skills, Claude plugins) are not initialized here.
+
+Espanso reads `private/espanso/personal.yml` and `private/espanso/finance.yml` through imports in `match/base.yml`. Those files stay in the submodule. The imports are four levels up from the stowed match file (`../../../../private/espanso/…`); the macOS tree used three because its config directory sits one level higher. `./install.sh` registers the user service when `espanso` is on `PATH`.
 
 `./install.sh` imports `private/gpg/public_keys.asc`, `private_keys.asc` and `ownertrust.txt` into `~/.gnupg`. The armored files stay in the submodule. The old key under `private/gpg/archive/` is not imported.
 
@@ -137,6 +140,7 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - OpenCode's Warp plugin, the osascript notifier, `tui.json` / `cli.json`, the two ocx profiles, and the vendored wakatime and kdco bundles (SI-150). opencode 1.18.29 does not read `tui.json` or `cli.json`. The profiles point at a missing `claude-mem.js` and repeat the root file. Theme stays `system`.
 - Pi's Catppuccin theme, MLX model entry, and model ids `claude-opus-5-5`, `claude-sonnet-5-5`, and `grok-4.7` (SI-150). Theme stays `omarchy-system`. pi 0.85.1 warns that none of those model ids exist. `pi-subagents` and `pi-agent-browser-native` fail to load on this pi, so they are not in `packages`. `pi/patterns.yaml` is the upstream defender sample and is overwritten on install.
 - `pinentry-mac` and `private/gpg/archive/` (SI-152). The agent pinentry is `/usr/bin/pinentry-gnome3`. The archive file is an old key and is not imported.
+- Espanso's private snippets and the X11 package (SI-196). Address, phone, bank, tax and wallet snippets stay in `private/espanso/`. The package is `espanso-wayland`; the X11 build does not work on this session. `keyboard_layout` follows Hyprland's English (US) map, not the Mac's Colemak-DH. `ALT+SPACE` is free: Omarchy binds `SUPER+SPACE` and the Super combinations, not Alt+Space. Hub packages under `match/packages/` are not tracked.
 - The Mac paths `~/.ack`, `~/.ag` and `~/.wget` (SI-151). ack reads `~/.ackrc`, ag reads `~/.agignore`, and wget reads `~/.wgetrc`. Nothing in the Mac shell pointed the tools at the old names. The global gitignore lists `.agignore`, so `tools/.agignore` is tracked with `git add -f`. Other `.agignore` files stay ignored. ctags, ack, ag, wget, gitmux and markdownlint are not installed here; the files are in place for when they are. gitmux is not added to Omarchy's tmux. `~/.editorconfig` is an EditorConfig root and sets tab indentation, same as the Mac file. mise 2026.10.15 still reads the three default-package lists, warns about them from 2026.11.0, and stops reading them in 2027.11.0. This change does not install those packages into the current Ruby, Node or Python.
 
 Grow this tree when a setting actually diverges. Do not snapshot all of `~/.config`.
