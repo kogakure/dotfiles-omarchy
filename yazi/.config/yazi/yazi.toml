@@ -1,0 +1,8 @@
+#:schema https://yazi-rs.github.io/schemas/yazi.json
+
+# Natural sort is the Mac setting that is not already a yazi 26.9 default.
+# The section is [mgr]; yazi 26 rejects the old [manager] name.
+# The edit opener stays the default, which runs $EDITOR (nvim in ~/.bashrc).
+
+[mgr]
+sort_by = "natural"
