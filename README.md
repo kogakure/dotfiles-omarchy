@@ -54,6 +54,7 @@ Host overlay is selected by hostname (`omarchy` on this laptop). Override with `
 | `opencode` | `~/.config/opencode/` | Permissions, MCP, compaction, three plugins, slash commands, and the gh-stack skill. Theme stays `system`. Herdr's own files stay where Herdr wrote them. |
 | `pi` | `~/.pi/` | Sandbox, four extensions, and the packages pi 0.85.1 can load. Theme stays `omarchy-system`. Personal skills are symlinks into `private/agents/skills`. |
 | `tools` | `~/.editorconfig`, `~/.markdownlint.yaml`, `~/.ctags`, `~/.curlrc`, `~/.gemrc`, `~/.ackrc`, `~/.agignore`, `~/.wgetrc`, `~/.gitmux.conf`, `~/.default-gems`, `~/.default-npm-packages`, `~/.default-python-packages` | Small root configs from the Mac. ack, ag and wget use the filenames those tools read. gitmux is not called from Omarchy's tmux. mise reads the three package lists the next time it installs Ruby, Node or Python. |
+| `gnupg` | `~/.gnupg/gpg.conf`, `dirmngr.conf`, `gpg-agent.conf` | `gpg.conf` and `dirmngr.conf` are the Mac files. Pinentry is `/usr/bin/pinentry-gnome3`, not `pinentry-mac`. `./install.sh` imports the vault keyring. SSH stays with ssh-agent. |
 
 ## Extra packages
 
@@ -95,15 +96,17 @@ jj reads `~/dotfiles/private/jj/config.toml` through `~/.config/jj/config.toml`.
 
 Pi reads its personal skills through symlinks in `~/.pi/agent/skills` that point at `private/agents/skills`. The skill files stay in the submodule.
 
-Claude, Codex and Grok each have a `personal` and a `work` tree in the vault, shared with the Macs and not split by host. Those trees are not linked. GPG and Espanso still get their own links when those are ported. Nested submodules inside the vault (agent skills, Claude plugins) are not initialized here.
+Claude, Codex and Grok each have a `personal` and a `work` tree in the vault, shared with the Macs and not split by host. Those trees are not linked. Espanso still gets its own links when that is ported. Nested submodules inside the vault (agent skills, Claude plugins) are not initialized here.
 
-Repos under `~/Code/personal` and `~/Code/work` pick up the matching identity file. `~/dotfiles` is outside those trees, so `install.sh` points this checkout at `config-personal` and leaves `commit.gpgsign` off. Anywhere else, run `glu` once in that repo:
+`./install.sh` imports `private/gpg/public_keys.asc`, `private_keys.asc` and `ownertrust.txt` into `~/.gnupg`. The armored files stay in the submodule. The old key under `private/gpg/archive/` is not imported.
+
+Repos under `~/Code/personal` and `~/Code/work` pick up the matching identity file. `~/dotfiles` is outside those trees, so `install.sh` points this checkout at `config-personal`. Anywhere else, run `glu` once in that repo:
 
 ```bash
 git config --local include.path ~/dotfiles/private/git/config-personal
 ```
 
-`config-personal` also sets `commit.gpgsign`. The public git config turns signing back off, because this machine does not have the secret key yet. `glu` writes a local include, which beats that global override, so a repo you `glu` will try to sign until you set `commit.gpgsign` false locally or import the key.
+`config-personal` also sets `commit.gpgsign`. That is no longer forced off in the public git config. If the vault backup is missing, `install.sh` still sets `commit.gpgsign` false locally so a checkout without a key does not try to sign.
 
 ## Do not track
 
@@ -111,7 +114,8 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - `~/.local/state/omarchy/current` (generated theme copies)
 - SSH private keys, `~/.config/gh/hosts.yml` (SI-146). Login stays in the keyring. The Mac `gh.fish` account switcher is not ported: this machine has one github.com account and `GITHUB_TOKEN` is unset. `./install.sh` installs the eight repos in `packages/gh-extensions`; those checkouts are not tracked.
 - Git name, email and signing key (those live in `private/git/`)
-- jj name, email and signing key (those live in `private/jj/`). `signing.behavior` is `own` and the backend is `gpg`, so `jj git init` and any new commit try to sign. This machine has no secret key until SI-152, and that init fails with `No secret key` until then.
+- jj name, email and signing key (those live in `private/jj/`). `signing.behavior` is `own` and the backend is `gpg`, so `jj git init` and any new commit try to sign with the key `./install.sh` imports.
+- GPG secret keys (SI-152). They stay in `private/gpg/`. `~/.gnupg` itself is not stowed: GnuPG writes the keybox and trustdb there. The Mac backup and restore scripts are not ported; they source `bin/lib/common.sh`. `gpg-agent` does not get `enable-ssh-support`.
 - Browser profiles
 - Hook `*.sample` files Omarchy ships
 - `~/.config/mise/config.toml` (Omarchy writes this via `mise use -g`)
@@ -126,6 +130,7 @@ git config --local include.path ~/dotfiles/private/git/config-personal
 - Herdr-managed agent files (SI-150). `herdr-agent-state` and `herdr-tui-session` say Herdr overwrites them. This machine's copies stay (opencode integration 10, pi integration 8). The Mac copies are newer and are not ported.
 - OpenCode's Warp plugin, the osascript notifier, `tui.json` / `cli.json`, the two ocx profiles, and the vendored wakatime and kdco bundles (SI-150). opencode 1.18.29 does not read `tui.json` or `cli.json`. The profiles point at a missing `claude-mem.js` and repeat the root file. Theme stays `system`.
 - Pi's Catppuccin theme, MLX model entry, and model ids `claude-opus-5-5`, `claude-sonnet-5-5`, and `grok-4.7` (SI-150). Theme stays `omarchy-system`. pi 0.85.1 warns that none of those model ids exist. `pi-subagents` and `pi-agent-browser-native` fail to load on this pi, so they are not in `packages`. `pi/patterns.yaml` is the upstream defender sample and is overwritten on install.
+- `pinentry-mac` and `private/gpg/archive/` (SI-152). The agent pinentry is `/usr/bin/pinentry-gnome3`. The archive file is an old key and is not imported.
 - The Mac paths `~/.ack`, `~/.ag` and `~/.wget` (SI-151). ack reads `~/.ackrc`, ag reads `~/.agignore`, and wget reads `~/.wgetrc`. Nothing in the Mac shell pointed the tools at the old names. The global gitignore lists `.agignore`, so `tools/.agignore` is tracked with `git add -f`. Other `.agignore` files stay ignored. ctags, ack, ag, wget, gitmux and markdownlint are not installed here; the files are in place for when they are. gitmux is not added to Omarchy's tmux. `~/.editorconfig` is an EditorConfig root and sets tab indentation, same as the Mac file. mise 2026.10.15 still reads the three default-package lists, warns about them from 2026.11.0, and stops reading them in 2027.11.0. This change does not install those packages into the current Ruby, Node or Python.
 
 Grow this tree when a setting actually diverges. Do not snapshot all of `~/.config`.
