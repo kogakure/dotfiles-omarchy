@@ -75,6 +75,12 @@ grep -vE '^#|^$' packages/aur.txt | xargs -r omarchy pkg aur add
 
 The post-update hook reminds you when the lists have drifted. It does not rewrite them.
 
+## Checks
+
+`bin/dotfiles-lint` runs shellcheck and shfmt on `install.sh`, the Omarchy post-update hook, the pre-commit hook, and itself. `./install.sh` points `core.hooksPath` at `.githooks`, so the hook lints whatever of those files is staged. CI on Ubuntu runs the same script with the shellcheck and shfmt pins from `mise/.config/mise/mise.toml`. Sourced snippets under `bash/.functions` are not in that set.
+
+The hook fails open when shellcheck or shfmt is missing, so a broken `PATH` cannot block the commit that fixes it. Bypass once with `git commit --no-verify`.
+
 ## Daily use
 
 Edit the live files (`Super + Space` → Setup, or `$EDITOR ~/.config/hypr/...`). They are symlinks, so `git -C ~/dotfiles status` sees the change. Commit from `~/dotfiles`.

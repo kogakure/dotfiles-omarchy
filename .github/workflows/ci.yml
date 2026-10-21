@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      # private/ is not needed to lint the public shell scripts, and CI cannot
+      # fetch the vault.
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Install mise
+        uses: jdx/mise-action@v2
+        with:
+          install: false
+          cache: true
+
+      # Pins live in mise/.config/mise/mise.toml, not a repo-root mise.toml
+      # (a root file would only apply inside this checkout; SI-118).
+      - name: Install the pinned lint tools
+        run: |
+          set -euo pipefail
+          pin() {
+            sed -n "s/^$1 *= *\"\([^\"]*\)\"\$/\1/p" mise/.config/mise/mise.toml | head -1
+          }
+          mkdir -p "$HOME/.config/mise"
+          {
+            echo '[tools]'
+            for tool in shellcheck shfmt; do
+              version=$(pin "$tool")
+              if [ -z "$version" ]; then
+                echo "::error file=mise/.config/mise/mise.toml::no version pin for '$tool'" >&2
+                exit 1
+              fi
+              echo "$tool = \"$version\""
+            done
+          } >"$HOME/.config/mise/config.toml"
+          mise trust "$HOME/.config/mise/config.toml"
+          mise install --yes
+          echo "$HOME/.local/share/mise/shims" >>"$GITHUB_PATH"
+
+      - name: Lint
+        run: bin/dotfiles-lint --strict
+
+      # A broken PATH must not block the commit that fixes it.
+      - name: pre-commit hook fails open on a broken PATH
+        run: |
+          set -uo pipefail
+          out=$(env -i HOME="$HOME" PATH=/usr/bin:/bin .githooks/pre-commit 2>&1) && rc=0 || rc=$?
+          printf '%s\n' "$out"
+          if [ "${rc:-0}" -ne 0 ]; then
+            echo "::error::pre-commit exited $rc under PATH=/usr/bin:/bin; it must fail open"
+            exit 1
+          fi
+          case "$out" in
+            *fail-open*) ;;
+            *)
+              echo "::error::hook exited 0 but did not take the fail-open path"
+              exit 1
+              ;;
+          esac

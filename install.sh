@@ -47,7 +47,8 @@ backup_if_conflict() {
     fi
   fi
 
-  local bak="${dest}.bak.$(date +%s)"
+  local bak
+  bak="${dest}.bak.$(date +%s)"
   echo "Backing up $dest -> $bak"
   mv "$dest" "$bak"
 }
@@ -97,9 +98,9 @@ import_gpg_keys() {
     return 0
   fi
 
-  if ! gpg --batch --quiet --import "$dir/public_keys.asc" >>"$log" 2>&1 \
-    || ! gpg --batch --quiet --import "$dir/private_keys.asc" >>"$log" 2>&1 \
-    || ! gpg --batch --quiet --import-ownertrust "$dir/ownertrust.txt" >>"$log" 2>&1; then
+  if ! gpg --batch --quiet --import "$dir/public_keys.asc" >>"$log" 2>&1 ||
+    ! gpg --batch --quiet --import "$dir/private_keys.asc" >>"$log" 2>&1 ||
+    ! gpg --batch --quiet --import-ownertrust "$dir/ownertrust.txt" >>"$log" 2>&1; then
     echo "GPG key import failed. Log: $log" >&2
     return 1
   fi
@@ -144,7 +145,7 @@ install_herdr_plugins() {
       continue
     fi
     herdr plugin install "$spec" --yes
-  done < "$list"
+  done <"$list"
 }
 
 install_gh_extensions() {
@@ -166,7 +167,7 @@ install_gh_extensions() {
       continue
     fi
     gh extension install "$spec"
-  done < "$list"
+  done <"$list"
 }
 
 # This checkout lives outside the includeIf directories, so without a local
@@ -175,6 +176,13 @@ install_gh_extensions() {
 # this repo as one of its own and folds the directory on the next restow.
 # The local commit.gpgsign false from before SI-152 beats that include, so
 # drop it once a secret key is present. Keep it when the vault backup is not.
+
+# Pre-commit runs bin/dotfiles-lint on staged shell. core.hooksPath replaces
+# .git/hooks; this repo has no other hooks. Skip once with --no-verify.
+if [[ -e "$ROOT/.git" && -f "$ROOT/.githooks/pre-commit" ]]; then
+  git -C "$ROOT" config --local core.hooksPath .githooks
+fi
+
 if [[ -e "$ROOT/.git" && -f "$ROOT/private/git/config-personal" ]]; then
   # Quoted on purpose: git expands ~ in include.path. Leave it for git.
   # shellcheck disable=SC2088
